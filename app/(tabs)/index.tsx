@@ -65,6 +65,20 @@ export default function HomeScreen() {
         </ThemedText>
       </ThemedView>
       <ThemedView style={styles.stepContainer}>
+        <ThemedText type="subtitle">Navigate</ThemedText>
+        <Link href="/FlightScreen">
+          <Link.Trigger>
+            <ThemedText type="defaultSemiBold">Home → Flight</ThemedText>
+          </Link.Trigger>
+        </Link>
+        <Link href="/StatsScreen">
+          <Link.Trigger>
+            <ThemedText type="defaultSemiBold">Home → Stats</ThemedText>
+          </Link.Trigger>
+        </Link>
+        <ThemedText>Use the links above to load the placeholder screens.</ThemedText>
+      </ThemedView>
+      <ThemedView style={styles.stepContainer}>
         <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
         <ThemedText>
           {`When you're ready, run `}
