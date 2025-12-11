@@ -42,6 +42,10 @@ export default function HomeScreen() {
     router.push("/StatsScreen");
   };
 
+  const handleMapStyle = () => {
+    router.push("/map-style");
+  };
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Plan Flight</Text>
@@ -84,6 +88,14 @@ export default function HomeScreen() {
       </Pressable>
 
       {error ? <Text style={styles.error}>{error}</Text> : null}
+
+      <Pressable style={styles.card} onPress={handleMapStyle}>
+        <View style={{ flex: 1 }}>
+          <Text style={styles.cardTitle}>Map Style</Text>
+          <Text style={styles.cardSubtitle}>Choose how the world map looks</Text>
+        </View>
+        <Text style={styles.cardAction}>Open</Text>
+      </Pressable>
 
       <Pressable style={[styles.button, styles.secondary]} onPress={handleViewStats}>
         <Text style={styles.secondaryText}>View Stats</Text>
@@ -145,5 +157,28 @@ const styles = StyleSheet.create({
     textAlign: "center",
     fontSize: 14,
     fontWeight: "600",
+  },
+  card: {
+    backgroundColor: "#f5f7fb",
+    borderRadius: 12,
+    padding: 16,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    borderWidth: 1,
+    borderColor: "#e5e7eb",
+    marginTop: 8,
+  },
+  cardTitle: {
+    fontSize: 16,
+    fontWeight: "700",
+  },
+  cardSubtitle: {
+    color: "#6b7280",
+    marginTop: 4,
+  },
+  cardAction: {
+    color: "#0a84ff",
+    fontWeight: "700",
   },
 });
