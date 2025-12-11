@@ -33,7 +33,7 @@ export default function HomeScreen() {
       params: {
         origin: trimmedOrigin,
         destination: trimmedDestination,
-        duration: durationNumber.toString(),
+        durationMinutes: durationNumber.toString(),
       },
     });
   };

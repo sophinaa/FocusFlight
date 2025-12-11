@@ -16,16 +16,19 @@ export default function FlightScreen() {
   const params = useLocalSearchParams<{
     origin?: string;
     destination?: string;
+    durationMinutes?: string;
+    // legacy fallback
     duration?: string;
   }>();
 
   const origin = params.origin || "Origin";
   const destination = params.destination || "Destination";
   const durationMinutes = useMemo(() => {
-    const parsed = Number(params.duration);
+    const raw = params.durationMinutes ?? params.duration;
+    const parsed = Number(raw);
     if (Number.isNaN(parsed) || parsed < 0) return 0;
     return parsed;
-  }, [params.duration]);
+  }, [params.duration, params.durationMinutes]);
   const totalSeconds = Math.max(0, Math.round(durationMinutes * 60));
 
   const [remaining, setRemaining] = useState(totalSeconds);
