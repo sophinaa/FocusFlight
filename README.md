@@ -49,5 +49,4 @@ Create a lightweight app that:
 
 **STATUS**
 
-Project just started.
-Expo project initialised and ready for building the UI + logic.
+unfinished, leaving project atm
