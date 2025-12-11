@@ -34,6 +34,7 @@ export default function FlightScreen() {
   const [remaining, setRemaining] = useState(totalSeconds);
   const [isPaused, setIsPaused] = useState(totalSeconds === 0);
   const [ended, setEnded] = useState(false);
+  const [completionMessage, setCompletionMessage] = useState<string | null>(null);
   const navigationEndedRef = useRef(false);
   const savingRef = useRef(false);
   const startedAtRef = useRef<string>(new Date().toISOString());
@@ -54,6 +55,11 @@ export default function FlightScreen() {
         endedAt,
         status,
       };
+
+      console.log("Flight finished:", flight);
+      setCompletionMessage(
+        status === "completed" ? "Flight complete! Returning home..." : "Flight aborted. Returning home..."
+      );
 
       try {
         const existing = await AsyncStorage.getItem("flights");
@@ -149,6 +155,7 @@ export default function FlightScreen() {
           <Text style={styles.buttonText}>End Flight</Text>
         </Pressable>
       </View>
+      {completionMessage ? <Text style={styles.message}>{completionMessage}</Text> : null}
     </View>
   );
 }
@@ -209,6 +216,11 @@ const styles = StyleSheet.create({
   },
   secondaryText: {
     color: "#111827",
+    fontWeight: "600",
+  },
+  message: {
+    marginTop: 12,
+    color: "#0a6847",
     fontWeight: "600",
   },
 });
