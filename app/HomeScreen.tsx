@@ -19,6 +19,10 @@ export default function HomeScreen() {
     });
   };
 
+  const handleViewStats = () => {
+    router.push("/StatsScreen");
+  };
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Plan Flight</Text>
@@ -115,6 +119,3 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
 });
-  const handleViewStats = () => {
-    router.push("/StatsScreen");
-  };
