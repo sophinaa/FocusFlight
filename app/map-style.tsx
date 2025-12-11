@@ -1,4 +1,5 @@
-import React from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import React, { useEffect, useState } from "react";
 import { View, Text, StyleSheet, Pressable } from "react-native";
 import { router } from "expo-router";
 
@@ -10,6 +11,19 @@ const options = [
 ];
 
 export default function MapStyleScreen() {
+  const [selected, setSelected] = useState<string | null>(null);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const stored = await AsyncStorage.getItem("mapStyle");
+        if (stored) setSelected(stored);
+      } catch (err) {
+        console.warn("Failed to load map style", err);
+      }
+    })();
+  }, []);
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Map Style</Text>
@@ -20,14 +34,19 @@ export default function MapStyleScreen() {
           key={option.key}
           style={styles.option}
           onPress={() => {
-            // Placeholder: hook this into settings later
+            AsyncStorage.setItem("mapStyle", option.title).catch((err) =>
+              console.warn("Failed to save map style", err)
+            );
+            setSelected(option.title);
             router.back();
           }}>
           <View style={{ flex: 1 }}>
             <Text style={styles.optionTitle}>{option.title}</Text>
             <Text style={styles.optionDesc}>{option.description}</Text>
           </View>
-          <Text style={styles.optionAction}>Select</Text>
+          <Text style={styles.optionAction}>
+            {selected === option.title ? "Selected" : "Select"}
+          </Text>
         </Pressable>
       ))}
     </View>

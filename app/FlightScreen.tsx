@@ -10,7 +10,8 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { View, Text, StyleSheet, Pressable } from "react-native";
-import { useLocalSearchParams, router } from "expo-router";
+import { useLocalSearchParams, router, useFocusEffect } from "expo-router";
+import { DesignTokens } from "@/constants/design-tokens";
 
 export default function FlightScreen() {
   const params = useLocalSearchParams<{
@@ -35,6 +36,7 @@ export default function FlightScreen() {
   const [isPaused, setIsPaused] = useState(totalSeconds === 0);
   const [ended, setEnded] = useState(false);
   const [completionMessage, setCompletionMessage] = useState<string | null>(null);
+  const [mapStyle, setMapStyle] = useState<string | null>(null);
   const navigationEndedRef = useRef(false);
   const savingRef = useRef(false);
   const startedAtRef = useRef<string>(new Date().toISOString());
@@ -94,6 +96,19 @@ export default function FlightScreen() {
     }
   }, [completeFlight, totalSeconds]);
 
+  useFocusEffect(
+    useCallback(() => {
+      (async () => {
+        try {
+          const stored = await AsyncStorage.getItem("mapStyle");
+          setMapStyle(stored || null);
+        } catch (err) {
+          console.warn("Failed to load map style", err);
+        }
+      })();
+    }, [])
+  );
+
   useEffect(() => {
     if (isPaused || ended || totalSeconds === 0) return;
     const interval = setInterval(() => {
@@ -125,6 +140,34 @@ export default function FlightScreen() {
       ? Math.min(1, Math.max(0, elapsedSeconds / totalSeconds))
       : 1;
 
+  const accent = useMemo(() => {
+    switch ((mapStyle || "Standard").toLowerCase()) {
+      case "terra":
+        return "#14b8a6";
+      case "monochrome":
+        return "#a3e635";
+      case "satellite":
+        return "#16a34a";
+      case "standard":
+      default:
+        return "#3b82f6";
+    }
+  }, [mapStyle]);
+
+  const mapBg = useMemo(() => {
+    switch ((mapStyle || "Standard").toLowerCase()) {
+      case "terra":
+        return ["#050816", "#1a1038"];
+      case "monochrome":
+        return ["#0f1115", "#1a1c22"];
+      case "satellite":
+        return ["#1a2a1a", "#0f1a12"];
+      case "standard":
+      default:
+        return ["#0d253f", "#123b4a"];
+    }
+  }, [mapStyle]);
+
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60)
       .toString()
@@ -137,25 +180,41 @@ export default function FlightScreen() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.text}>In Flight</Text>
-      <Text style={styles.route}>
-        {origin} → {destination} · {durationMinutes} min
-      </Text>
-      <Text style={styles.subtext}>Duration: {durationMinutes} minutes</Text>
-      <Text style={styles.timer}>{formatTime(remaining)}</Text>
-      <View style={styles.progressTrack}>
-        <View style={[styles.progressFill, { width: `${progress * 100}%` }]} />
+      <View
+        style={[
+          styles.mapArea,
+          {
+            backgroundColor: mapBg[0],
+            borderColor: "#1f2937",
+          },
+        ]}>
+        <Text style={styles.mapText}>Map – {mapStyle || "Standard"}</Text>
       </View>
 
-      <View style={styles.actions}>
-        <Pressable style={[styles.button, styles.secondary]} onPress={togglePause} disabled={ended}>
-          <Text style={styles.secondaryText}>{isPaused ? "Resume" : "Pause"}</Text>
-        </Pressable>
-        <Pressable style={styles.button} onPress={handleEnd}>
-          <Text style={styles.buttonText}>End Flight</Text>
-        </Pressable>
+      <View style={styles.info}>
+        <Text style={styles.route}>
+          {origin} ✈ {destination}
+        </Text>
+        <Text style={styles.subtext}>Focus flight in progress</Text>
+        <Text style={styles.timer}>{formatTime(remaining)}</Text>
+        <Text style={styles.subtext}>Total: {durationMinutes} min</Text>
+        <View style={styles.progressTrack}>
+          <View style={[styles.progressFill, { width: `${progress * 100}%`, backgroundColor: accent }]} />
+        </View>
       </View>
-      {completionMessage ? <Text style={styles.message}>{completionMessage}</Text> : null}
+
+      <View style={styles.controls}>
+        <Pressable
+          style={[styles.primaryButton, { backgroundColor: accent }]}
+          onPress={togglePause}
+          disabled={ended}>
+          <Text style={styles.primaryText}>{isPaused ? "Resume" : "Pause"}</Text>
+        </Pressable>
+        <Pressable style={[styles.secondaryButton, { borderColor: DesignTokens.colors.danger }]} onPress={handleEnd}>
+          <Text style={[styles.secondaryText, { color: DesignTokens.colors.danger }]}>End Flight</Text>
+        </Pressable>
+        {completionMessage ? <Text style={styles.message}>{completionMessage}</Text> : null}
+      </View>
     </View>
   );
 }
@@ -163,64 +222,79 @@ export default function FlightScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    padding: DesignTokens.spacing.screenPadding,
+    backgroundColor: DesignTokens.colors.bgMain,
+    gap: DesignTokens.spacing.gapLarge,
+  },
+  mapArea: {
+    height: "40%",
+    borderRadius: DesignTokens.radii.cardRadius,
+    borderWidth: 1,
     alignItems: "center",
     justifyContent: "center",
-    padding: 24,
-    gap: 12,
   },
-  text: {
-    fontSize: 20,
-    fontWeight: "600",
+  mapText: {
+    color: DesignTokens.colors.textMain,
+    fontWeight: "700",
+  },
+  info: {
+    alignItems: "center",
+    gap: DesignTokens.spacing.gapSmall,
   },
   route: {
-    fontSize: 16,
-    color: "#333",
+    fontSize: DesignTokens.typography.h2.size,
+    fontWeight: DesignTokens.typography.h2.weight as any,
+    color: DesignTokens.colors.textMain,
+    textAlign: "center",
   },
   timer: {
-    fontSize: 32,
-    fontWeight: "700",
+    fontSize: DesignTokens.typography.timer.size,
+    fontWeight: DesignTokens.typography.timer.weight as any,
     letterSpacing: 1,
+    color: DesignTokens.colors.textMain,
   },
   subtext: {
-    color: "#555",
-    fontSize: 14,
+    color: DesignTokens.colors.textMuted,
+    fontSize: DesignTokens.typography.body.size,
   },
   progressTrack: {
     width: "100%",
-    height: 12,
-    backgroundColor: "#e5e7eb",
-    borderRadius: 999,
+    height: 8,
+    backgroundColor: "#1f2937",
+    borderRadius: DesignTokens.radii.buttonRadius,
     overflow: "hidden",
+    marginTop: DesignTokens.spacing.gapSmall,
   },
   progressFill: {
     height: "100%",
-    backgroundColor: "#0a84ff",
   },
-  actions: {
-    flexDirection: "row",
-    gap: 12,
-    marginTop: 16,
+  controls: {
+    gap: DesignTokens.spacing.gapMedium,
+    marginTop: DesignTokens.spacing.gapMedium,
   },
-  button: {
-    backgroundColor: "#0a84ff",
+  primaryButton: {
+    paddingVertical: 16,
+    borderRadius: DesignTokens.radii.buttonRadius,
+    alignItems: "center",
+  },
+  primaryText: {
+    color: DesignTokens.colors.textMain,
+    fontSize: DesignTokens.typography.h2.size,
+    fontWeight: "700",
+  },
+  secondaryButton: {
     paddingVertical: 12,
-    paddingHorizontal: 16,
-    borderRadius: 10,
-  },
-  buttonText: {
-    color: "#fff",
-    fontWeight: "600",
-  },
-  secondary: {
-    backgroundColor: "#e5e7eb",
+    borderRadius: DesignTokens.radii.buttonRadius,
+    borderWidth: 1,
+    alignItems: "center",
   },
   secondaryText: {
-    color: "#111827",
-    fontWeight: "600",
+    fontWeight: "700",
+    color: DesignTokens.colors.textMain,
   },
   message: {
-    marginTop: 12,
-    color: "#0a6847",
-    fontWeight: "600",
+    marginTop: 4,
+    color: DesignTokens.colors.textMain,
+    textAlign: "center",
   },
 });
