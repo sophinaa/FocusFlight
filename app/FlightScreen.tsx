@@ -2,7 +2,7 @@
  * Flight model (persisted to AsyncStorage under "flights"):
  * - origin: string (departure code/name)
  * - destination: string (arrival code/name)
- * - duration: number (minutes planned)
+ * - durationMinutes: number (minutes planned)
  * - startedAt: ISO timestamp (flight start)
  * - endedAt: ISO timestamp (flight end)
  * - status: "completed" | "aborted" (timer finished vs user ended early)
@@ -46,7 +46,7 @@ export default function FlightScreen() {
       const flight = {
         origin,
         destination,
-        duration: durationMinutes,
+        durationMinutes,
         startedAt: startedAtRef.current,
         endedAt,
         status,

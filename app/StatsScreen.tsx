@@ -6,7 +6,8 @@ import { useFocusEffect } from "expo-router";
 type Flight = {
   origin: string;
   destination: string;
-  duration: number;
+  durationMinutes?: number;
+  duration?: number; // legacy field support
   startedAt: string;
   endedAt: string;
   status: string;
@@ -22,12 +23,16 @@ export default function StatsScreen() {
   const computeStats = useCallback((flights: Flight[]) => {
     const validFlights = flights.filter(
       (f) =>
-        typeof f.duration === "number" &&
-        Number.isFinite(f.duration) &&
-        f.duration >= 0 &&
+        (typeof f.durationMinutes === "number" ||
+          typeof f.duration === "number") &&
+        Number.isFinite((f.durationMinutes ?? f.duration) as number) &&
+        (f.durationMinutes ?? f.duration)! >= 0 &&
         typeof f.startedAt === "string"
     );
-    const minutes = validFlights.reduce((sum, f) => sum + f.duration, 0);
+    const minutes = validFlights.reduce(
+      (sum, f) => sum + (f.durationMinutes ?? f.duration ?? 0),
+      0
+    );
     const days = new Set(
       validFlights.map((f) => {
         const date = new Date(f.startedAt);
