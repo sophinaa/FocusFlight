@@ -113,8 +113,11 @@ export default function FlightScreen() {
     completeFlight("aborted");
   };
 
+  const elapsedSeconds = totalSeconds - remaining;
   const progress =
-    totalSeconds > 0 ? Math.min(1, Math.max(0, 1 - remaining / totalSeconds)) : 1;
+    totalSeconds > 0
+      ? Math.min(1, Math.max(0, elapsedSeconds / totalSeconds))
+      : 1;
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60)
