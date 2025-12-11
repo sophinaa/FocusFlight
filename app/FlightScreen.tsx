@@ -1,4 +1,5 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { View, Text, StyleSheet, Pressable } from "react-native";
 import { useLocalSearchParams, router } from "expo-router";
 
@@ -20,24 +21,68 @@ export default function FlightScreen() {
 
   const [remaining, setRemaining] = useState(totalSeconds);
   const [isPaused, setIsPaused] = useState(totalSeconds === 0);
-  const [ended, setEnded] = useState(totalSeconds === 0);
+  const [ended, setEnded] = useState(false);
   const navigationEndedRef = useRef(false);
+  const savingRef = useRef(false);
+  const startedAtRef = useRef<string>(new Date().toISOString());
+
+  const completeFlight = useCallback(
+    async (status: "completed" | "ended") => {
+      if (savingRef.current) return;
+      savingRef.current = true;
+      setEnded(true);
+      setIsPaused(true);
+
+      const endedAt = new Date().toISOString();
+      const flight = {
+        origin,
+        destination,
+        duration: durationMinutes,
+        startedAt: startedAtRef.current,
+        endedAt,
+        status,
+      };
+
+      try {
+        const existing = await AsyncStorage.getItem("flights");
+        const parsed = existing ? JSON.parse(existing) : [];
+        const updated = Array.isArray(parsed) ? parsed : [];
+        updated.push(flight);
+        await AsyncStorage.setItem("flights", JSON.stringify(updated));
+      } catch (error) {
+        console.warn("Failed to save flight", error);
+      }
+
+      if (navigationEndedRef.current) return;
+      navigationEndedRef.current = true;
+      router.replace("/");
+    },
+    [destination, durationMinutes, origin]
+  );
 
   useEffect(() => {
     // Reset timer if route params change.
     setRemaining(totalSeconds);
     setIsPaused(totalSeconds === 0);
-    setEnded(totalSeconds === 0);
+    setEnded(false);
     navigationEndedRef.current = false;
+    savingRef.current = false;
+    startedAtRef.current = new Date().toISOString();
   }, [totalSeconds]);
 
   useEffect(() => {
-    if (isPaused || ended) return;
+    if (totalSeconds === 0 && !savingRef.current) {
+      completeFlight("completed");
+    }
+  }, [completeFlight, totalSeconds]);
+
+  useEffect(() => {
+    if (isPaused || ended || totalSeconds === 0) return;
     const interval = setInterval(() => {
       setRemaining((prev) => {
         if (prev <= 1) {
           clearInterval(interval);
-          setEnded(true);
+          completeFlight("completed");
           return 0;
         }
         return prev - 1;
@@ -45,13 +90,7 @@ export default function FlightScreen() {
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [isPaused, ended]);
-
-  useEffect(() => {
-    if (!ended || navigationEndedRef.current) return;
-    navigationEndedRef.current = true;
-    router.back();
-  }, [ended]);
+  }, [completeFlight, ended, isPaused, totalSeconds]);
 
   const togglePause = () => {
     if (ended) return;
@@ -59,9 +98,7 @@ export default function FlightScreen() {
   };
 
   const handleEnd = () => {
-    navigationEndedRef.current = true;
-    setEnded(true);
-    router.back();
+    completeFlight("ended");
   };
 
   const progress =
