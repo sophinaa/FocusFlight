@@ -20,6 +20,7 @@ export default function RootLayout() {
         <Stack.Screen name="FlightScreen" options={{ title: 'Flight' }} />
         <Stack.Screen name="StatsScreen" options={{ title: 'Stats' }} />
         <Stack.Screen name="map-style" options={{ title: 'Map Style' }} />
+        <Stack.Screen name="settings" options={{ title: 'Settings' }} />
       </Stack>
       <StatusBar style="auto" />
     </ThemeProvider>

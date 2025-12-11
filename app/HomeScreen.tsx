@@ -1,6 +1,7 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import React, { useCallback, useMemo, useRef, useState } from "react";
-import { View, Text, StyleSheet, TextInput, Pressable, ScrollView } from "react-native";
+import { View, Text, StyleSheet, TextInput, Pressable, ScrollView, Platform } from "react-native";
+import WebView from "react-native-webview";
 import { router, useFocusEffect } from "expo-router";
 import { DesignTokens } from "@/constants/design-tokens";
 
@@ -10,21 +11,43 @@ export default function HomeScreen() {
   const [duration, setDuration] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [mapStyle, setMapStyle] = useState<string | null>(null);
+  const [streakDays, setStreakDays] = useState<number>(0);
   const originRef = useRef<TextInput | null>(null);
 
-  const loadMapStyle = useCallback(async () => {
+  const loadHighlights = useCallback(async () => {
     try {
-      const stored = await AsyncStorage.getItem("mapStyle");
-      setMapStyle(stored || null);
+      const storedStyle = await AsyncStorage.getItem("mapStyle");
+      setMapStyle(storedStyle || null);
     } catch (err) {
       console.warn("Failed to load map style", err);
+    }
+
+    try {
+      const storedFlights = await AsyncStorage.getItem("flights");
+      const parsed = storedFlights ? JSON.parse(storedFlights) : [];
+      if (Array.isArray(parsed)) {
+        const days = new Set(
+          parsed.map((f) => {
+            const date = new Date(f?.startedAt);
+            if (Number.isNaN(date.getTime())) return null;
+            return date.toISOString().split("T")[0];
+          })
+        );
+        days.delete(null as never);
+        setStreakDays(days.size);
+      } else {
+        setStreakDays(0);
+      }
+    } catch (err) {
+      console.warn("Failed to load flights for streak", err);
+      setStreakDays(0);
     }
   }, []);
 
   useFocusEffect(
     useCallback(() => {
-      loadMapStyle();
-    }, [loadMapStyle])
+      loadHighlights();
+    }, [loadHighlights])
   );
 
   const handleTakeOff = () => {
@@ -116,7 +139,7 @@ export default function HomeScreen() {
   const navCards = [
     { title: "History", action: handleViewStats },
     { title: "Trends", action: handleViewStats },
-    { title: "Settings", action: handleMapStyle },
+    { title: "Settings", action: () => router.push("/settings") },
   ];
 
   return (
@@ -126,7 +149,22 @@ export default function HomeScreen() {
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}>
         <View style={styles.hero}>
-          <View style={[styles.globe, globeStyle]} />
+          {Platform.OS === "web" ? (
+            <View style={[styles.globeFallback, globeStyle]}>
+              <Text style={styles.fallbackText}>Globe preview on device</Text>
+            </View>
+          ) : (
+            <WebView
+              originWhitelist={["*"]}
+              source={require("@/assets/globe/index.html")}
+              style={styles.globeWeb}
+              containerStyle={[styles.globeWeb, globeStyle]}
+              javaScriptEnabled
+              scrollEnabled={false}
+              allowsInlineMediaPlayback
+              mediaPlaybackRequiresUserAction={false}
+            />
+          )}
           <View style={styles.heroOverlay}>
             <View style={styles.topRow}>
               <View>
@@ -135,7 +173,9 @@ export default function HomeScreen() {
               </View>
               <View style={styles.pill}>
                 <Text style={styles.pillIcon}>✈</Text>
-                <Text style={styles.pillText}>Next flight</Text>
+                <Text style={styles.pillText}>
+                  {streakDays > 0 ? `Streak: ${streakDays} days` : "Next flight"}
+                </Text>
               </View>
             </View>
             <View style={styles.heroBottom}>
@@ -257,21 +297,25 @@ const styles = StyleSheet.create({
     position: "relative",
     backgroundColor: "transparent",
   },
-  globe: {
+  globeWeb: {
     position: "absolute",
-    width: "90%",
-    aspectRatio: 1,
-    borderRadius: 9999,
-    right: "-10%",
-    top: "4%",
-    opacity: 0.75,
-    shadowRadius: 30,
-    shadowOffset: { width: 0, height: 10 },
+    inset: 0,
+  },
+  globeFallback: {
+    position: "absolute",
+    inset: 0,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  fallbackText: {
+    color: DesignTokens.colors.textMuted,
+    fontWeight: "700",
   },
   heroOverlay: {
     flex: 1,
     padding: DesignTokens.spacing.cardPadding,
     justifyContent: "space-between",
+    pointerEvents: "box-none",
   },
   topRow: {
     flexDirection: "row",
