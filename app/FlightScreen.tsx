@@ -1,3 +1,12 @@
+/**
+ * Flight model (persisted to AsyncStorage under "flights"):
+ * - origin: string (departure code/name)
+ * - destination: string (arrival code/name)
+ * - duration: number (minutes planned)
+ * - startedAt: ISO timestamp (flight start)
+ * - endedAt: ISO timestamp (flight end)
+ * - status: "completed" | "aborted" (timer finished vs user ended early)
+ */
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { View, Text, StyleSheet, Pressable } from "react-native";
@@ -27,7 +36,7 @@ export default function FlightScreen() {
   const startedAtRef = useRef<string>(new Date().toISOString());
 
   const completeFlight = useCallback(
-    async (status: "completed" | "ended") => {
+    async (status: "completed" | "aborted") => {
       if (savingRef.current) return;
       savingRef.current = true;
       setEnded(true);
@@ -98,7 +107,7 @@ export default function FlightScreen() {
   };
 
   const handleEnd = () => {
-    completeFlight("ended");
+    completeFlight("aborted");
   };
 
   const progress =
@@ -120,6 +129,7 @@ export default function FlightScreen() {
       <Text style={styles.route}>
         {origin} → {destination} · {durationMinutes} min
       </Text>
+      <Text style={styles.subtext}>Duration: {durationMinutes} minutes</Text>
       <Text style={styles.timer}>{formatTime(remaining)}</Text>
       <View style={styles.progressTrack}>
         <View style={[styles.progressFill, { width: `${progress * 100}%` }]} />
@@ -157,6 +167,10 @@ const styles = StyleSheet.create({
     fontSize: 32,
     fontWeight: "700",
     letterSpacing: 1,
+  },
+  subtext: {
+    color: "#555",
+    fontSize: 14,
   },
   progressTrack: {
     width: "100%",
