@@ -13,7 +13,7 @@ jgs   `~~~~~/ /~~`           (_, _(  ,_)_)
  
 ```
 
-                   **FOCUSFLIGHT**
+**FOCUSFLIGHT**
 
 
 A personal focus app inspired by “study flights.”
