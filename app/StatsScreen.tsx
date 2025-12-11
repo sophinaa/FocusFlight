@@ -4,8 +4,8 @@ import { View, Text, StyleSheet } from "react-native";
 export default function StatsScreen() {
   return (
     <View style={styles.container}>
-      <Text style={styles.text}>Stats Screen Placeholder</Text>
-      <Text style={styles.subtext}>Hours · Flights · Streak</Text>
+      <Text style={styles.text}>Stats go here</Text>
+      <Text style={styles.subtext}>Hours · Flights · Streak (placeholder)</Text>
     </View>
   );
 }
