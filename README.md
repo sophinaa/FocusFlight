@@ -1,66 +1,60 @@
-FocusFlight
+        -=\`\
+     |\ ____\_\__
+   -=\c`""""""" "`)
+jgs   `~~~~~/ /~~`
+        -==/ /
+          '-'
 
-A personal productivity app inspired by the “study flight” concept.
-Choose a route, set the duration of the flight, and stay focused until you “land.”
-Built for my personal use across iOS, Android (via Expo Go), and the web.
-
-🚀 Tech Stack
-
-React Native (UI)
-
-Expo (development framework & cross-platform tooling)
-
-TypeScript (strong typing)
-
-Expo Go (run instantly on my phone without a full build)
-
-Web Support using Expo’s web renderer
-
-AsyncStorage (local on-device storage for sessions, no backend)
-
-GitHub for version control + project tracking
-
-🎯 Project Goal
-
-Create a lightweight, private focus app that:
-
-Lets me pick origin, destination, and study duration
-
-Runs a clean, distraction-free countdown timer
-
-Logs each completed “flight”
-
-Tracks total hours, number of flights, and personal streaks
-
-Works on both my phone and laptop seamlessly
-
-📱 Running the App
-On Phone
-
-Install Expo Go from App Store / Google Play
-
-Run:
-
-npx expo start
+          _  _
+         ( `   )_
+        (    )    `)
+      (_   (_ .  _) _)
+                                     _
+                                    (  )
+     _ .                         ( `  ) . )
+   (  _ )_                      (_, _(  ,_)_)
+ (_  _(_ ,)
 
 
-Scan the QR code to open the app instantly.
+==================================================
+                   FOCUSFLIGHT
+==================================================
 
-On Web
+A personal focus app inspired by “study flights.”
+Pick a route, set a duration, and stay locked in until you land.
+Built only for my personal use — fast, simple, cross-platform.
 
-After running expo start, press w to launch the web version in your browser.
+==================================================
+TECH STACK
+==================================================
+- React Native
+- Expo
+- TypeScript
+- Expo Go (for instant iOS/Android development)
+- Expo Web (runs in a browser too)
+- AsyncStorage (local on-device storage)
+- Git + GitHub (version control)
 
-📌 Status
+==================================================
+GOAL
+==================================================
+Create a lightweight app that:
+- Lets me choose origin, destination, and flight duration
+- Runs a clean, distraction-free timer
+- Logs each completed “flight”
+- Tracks total hours, flights, and daily streaks
+- Works on both my phone and laptop with one codebase
 
-Currently in early development.
-Base Expo project initialised — UI and logic being built step by step.
+==================================================
+HOW TO RUN
+==================================================
+1. Install Expo Go on your phone.
+2. Start the dev server:
+       npx expo start
+3. Scan the QR code (phone) or press 'w' (web).
 
-🗂️ Future Plans
-
-Clean UI inspired by flight dashboards
-
-Custom route presets
-
-Optional PWA/web deployment
-
-Later: potential standalone iOS/Android build (EAS)
+==================================================
+STATUS
+==================================================
+Project just started.
+Expo project initialised and ready for building the UI + logic.
