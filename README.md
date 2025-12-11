@@ -1,50 +1,66 @@
-# Welcome to your Expo app 👋
+FocusFlight
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+A personal productivity app inspired by the “study flight” concept.
+Choose a route, set the duration of the flight, and stay focused until you “land.”
+Built for my personal use across iOS, Android (via Expo Go), and the web.
 
-## Get started
+🚀 Tech Stack
 
-1. Install dependencies
+React Native (UI)
 
-   ```bash
-   npm install
-   ```
+Expo (development framework & cross-platform tooling)
 
-2. Start the app
+TypeScript (strong typing)
 
-   ```bash
-   npx expo start
-   ```
+Expo Go (run instantly on my phone without a full build)
 
-In the output, you'll find options to open the app in a
+Web Support using Expo’s web renderer
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+AsyncStorage (local on-device storage for sessions, no backend)
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+GitHub for version control + project tracking
 
-## Get a fresh project
+🎯 Project Goal
 
-When you're ready, run:
+Create a lightweight, private focus app that:
 
-```bash
-npm run reset-project
-```
+Lets me pick origin, destination, and study duration
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+Runs a clean, distraction-free countdown timer
 
-## Learn more
+Logs each completed “flight”
 
-To learn more about developing your project with Expo, look at the following resources:
+Tracks total hours, number of flights, and personal streaks
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+Works on both my phone and laptop seamlessly
 
-## Join the community
+📱 Running the App
+On Phone
 
-Join our community of developers creating universal apps.
+Install Expo Go from App Store / Google Play
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+Run:
+
+npx expo start
+
+
+Scan the QR code to open the app instantly.
+
+On Web
+
+After running expo start, press w to launch the web version in your browser.
+
+📌 Status
+
+Currently in early development.
+Base Expo project initialised — UI and logic being built step by step.
+
+🗂️ Future Plans
+
+Clean UI inspired by flight dashboards
+
+Custom route presets
+
+Optional PWA/web deployment
+
+Later: potential standalone iOS/Android build (EAS)
